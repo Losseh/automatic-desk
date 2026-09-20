@@ -19,6 +19,8 @@ JGB37-555
 
 ## Arduino-ide
 
+### sandbox issue
+
 ```
 [18644:1223/101056.126347:FATAL:setuid_sandbox_host.cc(158)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/justyna-halicz-szymanska/Programy/arduino-ide_2.3.7_Linux_64bit/chrome-sandbox is owned by root and has mode 4755.
 Pułapka debuggera/breakpoint (zrzut pamięci)
@@ -28,4 +30,25 @@ solution
 ```
 sudo chown root chrome-sandbox
 sudo chmod g+x,u+s chrome-sandbox
+```
+
+### Error: programmer is not responding
+
+trying to upload a program to dfrduino nano 4.0 using android ide. but getting:
+```
+Sketch uses 924 bytes (3%) of program storage space. Maximum is 30720 bytes.
+Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+Error: programmer is not responding Warning: attempt 1 of 10: not in sync: resp=0x00
+Error: programmer is not responding Warning: attempt 2 of 10: not in sync: resp=0x00
+Error: programmer is not responding Warning: attempt 3 of 10: not in sync: resp=0x00
+...
+```
+
+solution
+```
+Select Arduino Nano
+Try ATmega328P
+If that doesn't work, try ATmega328P (Old Bootloader)
+
+The Nano 4.0 is based on the ATmega328P, and the bootloader variant matters.
 ```
