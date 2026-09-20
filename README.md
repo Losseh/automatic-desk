@@ -14,3 +14,18 @@ ACS712 5A
 
 ### Motor
 JGB37-555
+
+# Troubleshooting
+
+## Arduino-ide
+
+```
+[18644:1223/101056.126347:FATAL:setuid_sandbox_host.cc(158)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/justyna-halicz-szymanska/Programy/arduino-ide_2.3.7_Linux_64bit/chrome-sandbox is owned by root and has mode 4755.
+Pułapka debuggera/breakpoint (zrzut pamięci)
+```
+
+solution
+```
+sudo chown root chrome-sandbox
+sudo chmod g+x,u+s chrome-sandbox
+```

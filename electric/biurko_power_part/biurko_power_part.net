@@ -1,0 +1,35 @@
+( { EESchema Netlist Version 1.1 created  sob, 27 gru 2025, 19:52:19 }
+ ( /737a03aa-d8e3-4b62-8248-1208899b2168 Capacitor_THT:CAP_CERAMIC3  C3 100nF
+  (    1 /12V_log )
+  (    2 /gnd )
+ )
+ ( /fc00cc88-abc6-4aee-89c9-4adcb8b7dae5 Inductor_THT:INDUCTOR2  L1 L
+  (    1 /12V )
+  (    2 /12V_log )
+ )
+ ( /457e655e-3cc7-443c-9e12-c7fc47161e93 Capacitor_THT:CAP_CERAMIC3  C1 100nF
+  (    1 /12V )
+  (    2 /gnd )
+ )
+ ( /47de13fe-6dfe-45cd-a17e-630b31de9bef Capacitor_THT:CAP_ELECTRO_250_NP  C2 470uF
+  (    1 /12V )
+  (    2 /gnd )
+ )
+ ( /84e97027-822f-4d7c-9623-c4f97f07d98e Capacitor_THT:CAP_ELECTRO_250_NP  C4 470uF
+  (    1 /12V_log )
+  (    2 /gnd )
+ )
+ ( /17882baf-cfc8-43eb-b8d3-954679d35875 Connector_PinHeader_2.54mm:PADS2  J2 mot_output
+  (    1 /gnd )
+  (    2 /12V )
+ )
+ ( /f8c64c7e-a611-4c0b-8216-c5d0408ea406 Connector_PinHeader_2.54mm:PADS2  J3 log_output
+  (    1 /gnd )
+  (    2 /12V_log )
+ )
+ ( /a9cfd77e-30b9-4257-afb9-31f93ca408f4 Connector_PinHeader_2.54mm:PADS2  J1 input
+  (    1 /12V )
+  (    2 /gnd )
+ )
+)
+*

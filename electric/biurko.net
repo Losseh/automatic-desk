@@ -1,0 +1,122 @@
+( { EESchema Netlist Version 1.1 created  nie, 4 sty 2026, 15:21:44 }
+ ( /31790f6f-b89f-44f4-88a9-aa4f32dbb5d4 TerminalBlock:TerminalBlock_bornier-2_P5.08mm  J1 12V_input_screw_terminal
+  (    1 Net-(J1-Pin_1) )
+  (    2 +12V )
+ )
+ ( /0f19e183-03c2-4619-8d54-b1332d27cca3 Capacitor_THT:CP_Axial_L10.0mm_D4.5mm_P15.00mm_Horizontal  C3 100nF
+  (    1 +12V )
+  (    2 GND1 )
+ )
+ ( /6f6a6401-4d7d-499b-87de-98d1464eaf97 Capacitor_THT:CP_Axial_L10.0mm_D4.5mm_P15.00mm_Horizontal  C4 100nF
+  (    1 +12L )
+  (    2 GND2 )
+ )
+ ( /a6fc9982-2d5e-4dfc-8484-e7c51583b5b3 TerminalBlock:TerminalBlock_bornier-2_P5.08mm  J7 12V_motors_screw_terminal
+  (    1 GND1 )
+  (    2 +12V )
+ )
+ ( /3691e0a8-82aa-40e5-ba18-28f316b8bdb4 LED_THT:LED_D3.0mm  D2 red
+  (    1 Net-(D2-K) )
+  (    2 +5VL )
+ )
+ ( /e825ec8b-4302-4d6c-8492-e6413e1ba5a4 Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical  J4 encoder
+  (    1 +5VL )
+  (    2 /encoder_out )
+  (    3 GND )
+ )
+ ( /1abe8a4d-5cd9-47b9-9634-6561adfe55a3 Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal  R2 220R
+  (    1 Net-(D3-K) )
+  (    2 /status )
+ )
+ ( /28efe3df-0839-4e28-8c70-7b28689909af Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical  J5 outer_control
+  (    1 /up )
+  (    2 /down )
+  (    3 GND )
+ )
+ ( /36da1a3b-bdbc-4124-840b-822c8e3d87c4 LED_THT:LED_D3.0mm  D3 yellow
+  (    1 Net-(D3-K) )
+  (    2 +5VL )
+ )
+ ( /c1d0730d-c176-4c2b-b36a-41f9b12d8ea4 Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal  R1 220R
+  (    1 Net-(D2-K) )
+  (    2 /error )
+ )
+ ( /40d055f5-776e-4e1b-a2c4-00038d3bbf5a Capacitor_THT:CP_Radial_D8.0mm_P3.50mm  C2 470uF
+  (    1 +12L )
+  (    2 GND2 )
+ )
+ ( /985d339e-83e9-41ce-a878-6e18830d9926 Inductor_THT:L_Radial_D10.0mm_P5.00mm_Neosid_SD12_style3  L1 10uH
+  (    1 +12V )
+  (    2 +12L )
+ )
+ ( /a9af2b9c-e03a-4156-8ae7-436947dfcd85 $noname  NT1 GND_tie
+  (    1 GND2 )
+  (    2 Net-(J1-Pin_1) )
+  (    3 GND1 )
+ )
+ ( /20c740f6-2d6e-4c4f-af7a-e27e1856b88c Package_DIP:DIP-5-6_W7.62mm_Socket  U1 step-down_buck
+  (    1 +12L )
+  (    2 GND2 )
+  (    3 GND )
+  (    4 +7.5V )
+ )
+ ( /6a453051-148e-4af0-8e24-59e1173ad025 Capacitor_THT:CP_Radial_D8.0mm_P3.50mm  C1 470uF
+  (    1 +12V )
+  (    2 GND1 )
+ )
+ ( /16883b94-4b9a-44bd-b84d-6ebd081d9d54 Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical  J3 lower_limit
+  (    1 /lower_lmt )
+  (    2 GND )
+ )
+ ( /2d217e00-0bd0-4752-907b-83d69ade0bd1 Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical  J2 upper_limit
+  (    1 /upper_lmt )
+  (    2 GND )
+ )
+ ( /9644fb54-5f0d-4c40-b000-02f1b9d3217a Button_Switch_THT:SW_PUSH_6mm  SW1 callibrate
+  (    1 GND )
+  (    2 /callibrate_trg )
+ )
+ ( /298da768-62cb-4bf2-a308-ce4e73fc0896 Module:Arduino_Nano  Arduino_nano2 
+  (    1 unconnected-(Arduino_nano2-D1{slash}TX-Pad1) )
+  (    2 unconnected-(Arduino_nano2-D0{slash}RX-Pad2) )
+  (    3 unconnected-(Arduino_nano2-RST-Pad3) )
+  (    4 GND )
+  (    5 /encoder_out )
+  (    6 /up )
+  (    7 /down )
+  (    8 /status )
+  (    9 /error )
+  (   10 unconnected-(Arduino_nano2-D7-Pad10) )
+  (   11 /callibrate_trg )
+  (   12 /upper_lmt )
+  (   13 /lower_lmt )
+  (   14 /pwm )
+  (   15 /dir )
+  (   16 unconnected-(Arduino_nano2-D13{slash}SCK-Pad16) )
+  (   17 unconnected-(Arduino_nano2-3V3-Pad17) )
+  (   18 unconnected-(Arduino_nano2-AREF-Pad18) )
+  (   19 mot_current )
+  (   20 unconnected-(Arduino_nano2-A1-Pad20) )
+  (   21 unconnected-(Arduino_nano2-A2-Pad21) )
+  (   22 unconnected-(Arduino_nano2-A3-Pad22) )
+  (   23 unconnected-(Arduino_nano2-A4-Pad23) )
+  (   24 unconnected-(Arduino_nano2-A5-Pad24) )
+  (   25 unconnected-(Arduino_nano2-A6-Pad25) )
+  (   26 unconnected-(Arduino_nano2-A7-Pad26) )
+  (   27 +5VL )
+  (   28 unconnected-(Arduino_nano2-RST-Pad28) )
+  (   29 GND )
+  (   30 +7.5V )
+ )
+ ( /597c03ea-8fe4-4b34-9560-645496a40792 Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical  J16 current_sensor
+  (    1 GND )
+  (    2 mot_current )
+  (    3 +5VL )
+ )
+ ( /e61f12ad-1520-465a-ad13-22dd02a30365 Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical  J6 motor_control
+  (    1 /dir )
+  (    2 /pwm )
+  (    3 GND )
+ )
+)
+*
