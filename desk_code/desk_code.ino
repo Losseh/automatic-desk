@@ -22,12 +22,38 @@
   https://docs.arduino.cc/built-in-examples/basics/Blink/
 */
 
+// current sensor constants
+int currentSensorPin = A0;
+int currentZero = 537;
+int currentValue = 0;
+int currentSamples = 5;
+
+// motor outputs
+int motorPwmPin = 11;
+int motorDirPin = 12;
+
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(motorPwmPin, OUTPUT);
+  pinMode(motorDirPin, OUTPUT);
 
   Serial.begin(9600);
+}
+
+void measureCurrent() {
+  currentValue = 0;
+  for (int i = 0; i < currentSamples; i++) {
+    currentValue += analogRead(currentSensorPin);
+  }
+  currentValue = currentValue / currentSamples - currentZero;
+}
+
+void setMotor(int dir, int pwm) {
+  analogWrite(motorPwmPin, pwm);
+  digitalWrite(motorDirPin, dir);
 }
 
 // the loop function runs over and over again forever
@@ -38,8 +64,11 @@ void loop() {
   // delay(1000);                      // wait for a second
 
   String response;
-  String on = String("on");
-  String off = String("off");
+
+  measureCurrent();
+  // Serial.println(currentValue);
+
+  delay(100);
 
   if (Serial.available()) {
     int inByte = Serial.read();
@@ -47,14 +76,30 @@ void loop() {
     uint8_t ledState = (inByte == '0') ? LOW : HIGH;
     digitalWrite(LED_BUILTIN, ledState);
 
-    if (ledState) {
-      Serial.println(on);
-    } else {
-      Serial.println(off);
+    int motorDir;
+    int motorPwm;
+    if (inByte == '0') {
+      motorDir = 0;
+      motorPwm = 0;
+    } else if (inByte == '1') {
+      motorDir = 0;
+      motorPwm = 50;
+    } else if (inByte == '2') {
+      motorDir = 0;
+      motorPwm = 150;
+    } else if (inByte == '3') {
+      motorDir = 0;
+      motorPwm = 250;
+    } else if (inByte == '4') {
+      motorDir = 1;
+      motorPwm = 50;
+    } else if (inByte == '5') {
+      motorDir = 1;
+      motorPwm = 150;
+    } else if (inByte == '6') {
+      motorDir = 1;
+      motorPwm = 250;
     }
-
-    Serial.write(ledState);
-
-    delay(100);
+    setMotor(motorDir, motorPwm);
   }
 }
