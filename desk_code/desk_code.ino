@@ -1,74 +1,118 @@
-/*
-  Blink
+// leds constants
+struct LedPins {
+  int yellow;
+  int red;
+  int builtIn;
+};
+const LedPins ledPins = {6, 7, LED_BUILTIN};
 
-  Turns an LED on for one second, then off for one second, repeatedly.
+// buttons
+struct ButtonsPins {
+  int up;
+  int down;
+  int callibrate;
+};
+const ButtonsPins buttonsPins = {3, 4, 9};
 
-  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
-  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
-  the correct LED pin independent of which board is used.
-  If you want to know what pin the on-board LED is connected to on your Arduino
-  model, check the Technical Specs of your board at:
-  https://docs.arduino.cc/hardware/
+struct ButtonsState {
+ int up;
+ int down;
+ int callibrate;
+};
+ButtonsState buttonsState = {LOW, LOW, LOW};
 
-  modified 8 May 2014
-  by Scott Fitzgerald
-  modified 2 Sep 2016
-  by Arturo Guadalupi
-  modified 8 Sep 2016
-  by Colby Newman
+// current sensor
+struct CurrentSensor {
+  int pin;
+  int zeroValue;
+  int samples;
+};
+const CurrentSensor currentSensor = {A0, 537, 5};
 
-  This example code is in the public domain.
-
-  https://docs.arduino.cc/built-in-examples/basics/Blink/
-*/
-
-// current sensor constants
-int currentSensorPin = A0;
-int currentZero = 537;
 int currentValue = 0;
-int currentSamples = 5;
 
-// motor outputs
-int motorPwmPin = 11;
-int motorDirPin = 12;
+// motor pins
+struct MotorPins {
+  int pwm;
+  int dir;
+};
+const MotorPins motorPins = {11, 12};
 
+
+String response;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(motorPwmPin, OUTPUT);
-  pinMode(motorDirPin, OUTPUT);
+
+  // initialize motor pins
+  pinMode(motorPins.pwm, OUTPUT);
+  pinMode(motorPins.dir, OUTPUT);
+
+  // initialize LED pins
+  pinMode(ledPins.builtIn, OUTPUT);
+  pinMode(ledPins.yellow, OUTPUT);
+  pinMode(ledPins.red, OUTPUT);
+
+  setLedOff(ledPins.builtIn);
+  setLedOff(ledPins.yellow);
+  setLedOff(ledPins.red);
+
+  // initialize buttons
+  pinMode(buttonsPins.up, INPUT_PULLUP);
+  pinMode(buttonsPins.down, INPUT_PULLUP);
+  pinMode(buttonsPins.callibrate, INPUT_PULLUP);
 
   Serial.begin(9600);
 }
 
 void measureCurrent() {
   currentValue = 0;
-  for (int i = 0; i < currentSamples; i++) {
-    currentValue += analogRead(currentSensorPin);
+  for (int i = 0; i < currentSensor.samples; i++) {
+    currentValue += analogRead(currentSensor.pin);
   }
-  currentValue = currentValue / currentSamples - currentZero;
+  currentValue = currentValue / currentSensor.samples - currentSensor.zeroValue;
 }
 
 void setMotor(int dir, int pwm) {
-  analogWrite(motorPwmPin, pwm);
-  digitalWrite(motorDirPin, dir);
+  analogWrite(motorPins.pwm, pwm);
+  digitalWrite(motorPins.dir, dir);
+}
+
+void setLedOff(int ledPin) {
+  digitalWrite(ledPin, HIGH);
+}
+
+void setLedOn(int ledPin) {
+  digitalWrite(ledPin, LOW);
+}
+
+void readButtons() {
+  buttonsState.up = digitalRead(buttonsPins.up);
+  buttonsState.down = digitalRead(buttonsPins.down);
+  buttonsState.callibrate = digitalRead(buttonsPins.callibrate);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  // digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  // delay(1000);                      // wait for a second
-  // digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  // delay(1000);                      // wait for a second
 
-  String response;
+  readButtons();
+
+  if (buttonsState.down == HIGH) {
+    setLedOff(ledPins.red);
+  } else {
+    setLedOn(ledPins.red);
+  }
+
+  if (buttonsState.up == HIGH) {
+    setLedOff(ledPins.yellow);
+  } else {
+    setLedOn(ledPins.yellow);
+  }
 
   measureCurrent();
   // Serial.println(currentValue);
 
-  delay(100);
+  // delay(50);
 
   if (Serial.available()) {
     int inByte = Serial.read();
@@ -76,30 +120,46 @@ void loop() {
     uint8_t ledState = (inByte == '0') ? LOW : HIGH;
     digitalWrite(LED_BUILTIN, ledState);
 
-    int motorDir;
-    int motorPwm;
-    if (inByte == '0') {
-      motorDir = 0;
-      motorPwm = 0;
-    } else if (inByte == '1') {
-      motorDir = 0;
-      motorPwm = 50;
-    } else if (inByte == '2') {
-      motorDir = 0;
-      motorPwm = 150;
-    } else if (inByte == '3') {
-      motorDir = 0;
-      motorPwm = 250;
-    } else if (inByte == '4') {
-      motorDir = 1;
-      motorPwm = 50;
-    } else if (inByte == '5') {
-      motorDir = 1;
-      motorPwm = 150;
-    } else if (inByte == '6') {
-      motorDir = 1;
-      motorPwm = 250;
+    // int motorDir;
+    // int motorPwm;
+    // if (inByte == '0') {
+    //   motorDir = 0;
+    //   motorPwm = 0;
+    // } else if (inByte == '1') {
+    //   motorDir = 0;
+    //   motorPwm = 50;
+    // } else if (inByte == '2') {
+    //   motorDir = 0;
+    //   motorPwm = 150;
+    // } else if (inByte == '3') {
+    //   motorDir = 0;
+    //   motorPwm = 250;
+    // } else if (inByte == '4') {
+    //   motorDir = 1;
+    //   motorPwm = 50;
+    // } else if (inByte == '5') {
+    //   motorDir = 1;
+    //   motorPwm = 150;
+    // } else if (inByte == '6') {
+    //   motorDir = 1;
+    //   motorPwm = 250;
+    // }
+    // setMotor(motorDir, motorPwm);
+
+    // yellow led
+    if (inByte == 'a') {
+      setLedOn(ledPins.yellow);
+    } else if (inByte == 'z') {
+      setLedOff(ledPins.yellow);
     }
-    setMotor(motorDir, motorPwm);
+
+    // red pin
+    if (inByte == 's') {
+      setLedOn(ledPins.red);
+    } else if (inByte == 'x') {
+      setLedOff(ledPins.red);
+    }
+
+    delay(50);
   }
 }
