@@ -1,10 +1,15 @@
-// leds constants
-struct LedPins {
-  int yellow;
-  int red;
-  int builtIn;
+#define LED_OFF 0x1
+#define LED_ON  0x0
+#define MAX_PWM 255
+
+// leds
+
+enum LedType : uint8_t {
+  YELLOW, RED, BUILTIN, COUNT
 };
-const LedPins ledPins = {6, 7, LED_BUILTIN};
+
+const int ledPins[] = {6, 7, LED_BUILTIN};
+uint8_t ledState[] = {LED_OFF, LED_OFF, LED_OFF};
 
 // buttons
 struct ButtonsPins {
@@ -31,14 +36,29 @@ const CurrentSensor currentSensor = {A0, 537, 5};
 
 int currentValue = 0;
 
-// motor pins
+// motor
 struct MotorPins {
   int pwm;
   int dir;
 };
 const MotorPins motorPins = {11, 12};
 
+struct MotorConstants {
+  int maxChange;
+};
 
+const MotorConstants motorConstants = {10};
+
+struct MotorState {
+  int actual;
+  int expected;
+};
+MotorState motorState = {0, 0};
+
+// position
+int position = 0;
+
+// response
 String response;
 
 // the setup function runs once when you press reset or power the board
@@ -49,13 +69,10 @@ void setup() {
   pinMode(motorPins.dir, OUTPUT);
 
   // initialize LED pins
-  pinMode(ledPins.builtIn, OUTPUT);
-  pinMode(ledPins.yellow, OUTPUT);
-  pinMode(ledPins.red, OUTPUT);
-
-  setLedOff(ledPins.builtIn);
-  setLedOff(ledPins.yellow);
-  setLedOff(ledPins.red);
+  for (uint8_t led = 0; led < LedType::COUNT; led++) {
+    pinMode(ledPins[led], OUTPUT);
+    digitalWrite(ledPins[led], LED_OFF);
+  }
 
   // initialize buttons
   pinMode(buttonsPins.up, INPUT_PULLUP);
@@ -73,13 +90,53 @@ void measureCurrent() {
   currentValue = currentValue / currentSensor.samples - currentSensor.zeroValue;
 }
 
-void setMotor(int dir, int pwm) {
+void setMotorRaw(int motorValue) {
+  uint8_t dir = motorValue < 0 ? 0 : 1;
+  uint8_t pwm = abs(motorValue);
   analogWrite(motorPins.pwm, pwm);
   digitalWrite(motorPins.dir, dir);
+
+  Serial.write("dir=");
+  Serial.print(dir);
+  Serial.write(" ");
+  Serial.write("pwm=");
+  Serial.print(pwm);
+  Serial.write("\n");
+}
+
+void updateMotor() {
+  int diff = motorState.expected - motorState.actual;
+  if (diff != 0) {
+
+    if (abs(diff) <= motorConstants.maxChange) {
+      motorState.actual = motorState.expected;
+    } else {
+      motorState.actual += (diff > 0)
+        ? motorConstants.maxChange
+        : -motorConstants.maxChange;
+
+      motorState.actual = constrain(motorState.actual, -MAX_PWM, MAX_PWM);
+    }
+
+    Serial.write("motor exp=");
+    Serial.print(motorState.expected);
+    Serial.write(" act=");
+    Serial.print(motorState.actual);
+    Serial.write("\n");
+
+    setMotorRaw(motorState.actual);
+  }
 }
 
 void setLedOff(int ledPin) {
   digitalWrite(ledPin, HIGH);
+}
+
+void setLed(LedType led, uint8_t value) {
+  if (ledState[led] != value) {
+    ledState[led] = value;
+    digitalWrite(ledPins[led], value);
+  }
 }
 
 void setLedOn(int ledPin) {
@@ -92,27 +149,27 @@ void readButtons() {
   buttonsState.callibrate = digitalRead(buttonsPins.callibrate);
 }
 
+void callibrate() {
+  if (position != 0) {
+    position = 0;
+    Serial.write("cal=0");
+  }
+}
+
 // the loop function runs over and over again forever
 void loop() {
 
   readButtons();
 
-  if (buttonsState.down == HIGH) {
-    setLedOff(ledPins.red);
-  } else {
-    setLedOn(ledPins.red);
+  if (buttonsState.callibrate == LOW) {
+    callibrate();
   }
 
-  if (buttonsState.up == HIGH) {
-    setLedOff(ledPins.yellow);
-  } else {
-    setLedOn(ledPins.yellow);
-  }
+  setLed(LedType::RED, buttonsState.down);
+  setLed(LedType::YELLOW, buttonsState.up);
 
   measureCurrent();
-  // Serial.println(currentValue);
-
-  // delay(50);
+  updateMotor();
 
   if (Serial.available()) {
     int inByte = Serial.read();
@@ -120,46 +177,35 @@ void loop() {
     uint8_t ledState = (inByte == '0') ? LOW : HIGH;
     digitalWrite(LED_BUILTIN, ledState);
 
-    // int motorDir;
-    // int motorPwm;
-    // if (inByte == '0') {
-    //   motorDir = 0;
-    //   motorPwm = 0;
-    // } else if (inByte == '1') {
-    //   motorDir = 0;
-    //   motorPwm = 50;
-    // } else if (inByte == '2') {
-    //   motorDir = 0;
-    //   motorPwm = 150;
-    // } else if (inByte == '3') {
-    //   motorDir = 0;
-    //   motorPwm = 250;
-    // } else if (inByte == '4') {
-    //   motorDir = 1;
-    //   motorPwm = 50;
-    // } else if (inByte == '5') {
-    //   motorDir = 1;
-    //   motorPwm = 150;
-    // } else if (inByte == '6') {
-    //   motorDir = 1;
-    //   motorPwm = 250;
-    // }
-    // setMotor(motorDir, motorPwm);
+    if (inByte == '0') {
+      motorState.expected = 0;
+    } else if (inByte == '1') {
+      motorState.expected = 50;
+    } else if (inByte == '2') {
+      motorState.expected = 150;
+    } else if (inByte == '3') {
+      motorState.expected = 255;
+    } else if (inByte == '4') {
+      motorState.expected = -50;
+    } else if (inByte == '5') {
+      motorState.expected = -150;
+    } else if (inByte == '6') {
+      motorState.expected = -255;
+    }
 
     // yellow led
     if (inByte == 'a') {
-      setLedOn(ledPins.yellow);
+      setLed(LedType::YELLOW, LED_ON);
     } else if (inByte == 'z') {
-      setLedOff(ledPins.yellow);
+      setLed(LedType::YELLOW, LED_OFF);
     }
 
     // red pin
     if (inByte == 's') {
-      setLedOn(ledPins.red);
+      setLed(LedType::RED, LED_ON);
     } else if (inByte == 'x') {
-      setLedOff(ledPins.red);
+      setLed(LedType::RED, LED_OFF);
     }
 
-    delay(50);
   }
 }
