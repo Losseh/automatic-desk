@@ -19,7 +19,10 @@ public:
   void update();
 
   void setSpeed(int speed);
-  void forceStop();
+  void up();
+  void down();
+  void stop();
+  void stopInstant();
 
   int speed() const;
   bool isMovingDown() const;

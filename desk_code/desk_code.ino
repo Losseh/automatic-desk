@@ -5,41 +5,25 @@
 #include "limit_switch.h"
 
 // leds
-const Led* yellowLed = new Led(6);
-const Led* redLed = new Led(7);
-const Led* builtInLed = new Led(LED_BUILTIN);
+const Led yellowLed(6);
+const Led redLed(7);
+const Led builtInLed(LED_BUILTIN);
 
 // buttons
-const Button* upBtn = new Button(3);
-const Button* downBtn = new Button(4);
-const Button* calBtn = new Button(9);
-
-struct ButtonsState {
- int up;
- int down;
- int callibrate;
-};
-ButtonsState buttonsState = {LOW, LOW, LOW};
+const Button upBtn(3);
+const Button downBtn(4);
+const Button calBtn(9);
 
 // limit switch
-const LimitSwitch* lowerLimitSwitch = new LimitSwitch(10);
+const LimitSwitch lowerLimitSwitch(10);
 
 // current sensor
-CurrentSensor *const currentSensor = new CurrentSensor(A0, {537, 3, 5});
+CurrentSensor currentSensor(A0, {537, 3, 5});
 
 // motor
 const MotorPins motorPins = {11, 12};
 const MotorConstants motorConstants = {10};
-Motor *const motor = new Motor(motorPins, motorConstants);
-
-struct MotorState {
-  int actual;
-  int expected;
-};
-MotorState motorState = {0, 0};
-
-// position
-int position = 0;
+Motor motor(motorPins, motorConstants);
 
 // loop counter
 uint8_t loopCounter = 0;
@@ -51,61 +35,62 @@ String response;
 void setup() {
 
   // initialize motor
-  motor->begin();
+  motor.begin();
 
   // initialize LEDs
-  yellowLed->begin();
-  redLed->begin();
-  builtInLed->begin();
+  yellowLed.begin();
+  redLed.begin();
+  builtInLed.begin();
 
   // initialize buttons
-  upBtn->begin();
-  downBtn->begin();
-  calBtn->begin();
+  upBtn.begin();
+  downBtn.begin();
+  calBtn.begin();
 
   // initialize limit switch
-  lowerLimitSwitch->begin();
+  lowerLimitSwitch.begin();
 
   Serial.begin(9600);
 }
 
-void readButtons() {
-  buttonsState.up = upBtn->isPressed();
-  buttonsState.down = downBtn->isPressed();
-  buttonsState.callibrate = calBtn->isPressed();
-}
-
-void callibrate() {
-  if (position != 0) {
-    position = 0;
-    Serial.write("cal=0");
-  }
+void updateButtons() {
+  upBtn.update();
+  downBtn.update();
+  calBtn.update();
 }
 
 // the loop function runs over and over again forever
 void loop() {
 
-  if (motor->isMovingDown() && lowerLimitSwitch->isPressed()) {
-    motor->forceStop();
+  if (motor.isMovingDown() && lowerLimitSwitch.isPressed()) {
+    motor.stopInstant();
   }
 
-  readButtons();
+  updateButtons();
 
-  if (buttonsState.callibrate == LOW) {
-    callibrate();
+  redLed.set(!downBtn.isPressed());
+  yellowLed.set(!upBtn.isPressed());
+
+  if (upBtn.isPressed() && downBtn.isPressed()) {
+    motor.stop();
+  } else if (upBtn.isPressed()) {
+    motor.up();
+  } else if (downBtn.isPressed()) {
+    if (!lowerLimitSwitch.isPressed()) {
+      motor.down();
+    }
+  } else {
+    motor.stop();
   }
 
-  redLed->set(!buttonsState.down);
-  yellowLed->set(!buttonsState.up);
-
-  currentSensor->measure();
-  motor->update();
+  currentSensor.measure();
+  motor.update();
 
   // if (loopCounter == 0) {
   //   Serial.write("current ma=");
-  //   Serial.print(currentSensor->movingAverage());
+  //   Serial.print(currentSensor.movingAverage());
   //   Serial.write("\ncurrent prev=");
-  //   Serial.print(currentSensor->previous());
+  //   Serial.print(currentSensor.previous());
   //   Serial.write("\n");
   // }
 
@@ -113,33 +98,33 @@ void loop() {
     int inByte = Serial.read();
 
     if (inByte == '0') {
-      motor->setSpeed(0);
+      motor.setSpeed(0);
     } else if (inByte == '1') {
-      motor->setSpeed(50);
+      motor.setSpeed(50);
     } else if (inByte == '2') {
-      motor->setSpeed(150);
+      motor.setSpeed(150);
     } else if (inByte == '3') {
-      motor->setSpeed(255);
+      motor.setSpeed(255);
     } else if (inByte == '4') {
-      motor->setSpeed(-50);
+      motor.setSpeed(-50);
     } else if (inByte == '5') {
-      motor->setSpeed(-150);
+      motor.setSpeed(-150);
     } else if (inByte == '6') {
-      motor->setSpeed(-255);
+      motor.setSpeed(-255);
     }
 
     // yellow led
     if (inByte == 'a') {
-      yellowLed->switchOn();
+      yellowLed.switchOn();
     } else if (inByte == 'z') {
-      yellowLed->switchOff();
+      yellowLed.switchOff();
     }
 
     // red pin
     if (inByte == 's') {
-      redLed->switchOn();
+      redLed.switchOn();
     } else if (inByte == 'x') {
-      redLed->switchOff();
+      redLed.switchOff();
     }
 
   }

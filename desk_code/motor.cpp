@@ -8,7 +8,7 @@ Motor::Motor(MotorPins pins, MotorConstants constants): pins(pins), constants(co
 void Motor::begin() {
   pinMode(pins.pwm, OUTPUT);
   pinMode(pins.dir, OUTPUT);
-  forceStop();
+  stopInstant();
 }
 
 void Motor::update() {
@@ -24,13 +24,13 @@ void Motor::update() {
 
   state.actual = constrain(state.actual, -MAX_PWM, MAX_PWM);
 
-  // if (diff != 0) {
-  //   Serial.write("motor exp=");
+  if (diff != 0) {
+    Serial.write("motor exp=");
   //   Serial.print(state.target);
   //   Serial.write(" act=");
-  //   Serial.print(state.actual);
-  //   Serial.write("\n");
-  // }
+    Serial.print(state.actual);
+    Serial.write("\n");
+  }
 
   apply();
 }
@@ -39,12 +39,24 @@ void Motor::setSpeed(int speed) {
   state.target = constrain(speed, -MAX_PWM, MAX_PWM);
 }
 
-void Motor::forceStop() {
+void Motor::up() {
+  setSpeed(MAX_PWM);
+}
+
+void Motor::down() {
+  setSpeed(-MAX_PWM);
+}
+
+void Motor::stop() {
+  setSpeed(0);
+}
+
+void Motor::stopInstant() {
   state.actual = 0;
   state.target = 0;
   apply();
 
-  Serial.write("motor stopped\n");
+  Serial.write("motor stopped inst\n");
 }
 
 int Motor::speed() const {
