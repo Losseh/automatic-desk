@@ -1,7 +1,7 @@
 #import "button.h"
 #import "Arduino.h"
 
-Button::Button(uint8_t pin): pin(pin) {}
+Button::Button(uint8_t pin): pin(pin), stableState(stableState), lastReading(lastReading) {}
 
 void Button::begin() {
   pinMode(pin, INPUT_PULLUP);
@@ -10,9 +10,9 @@ void Button::begin() {
 void Button::update() {
   bool reading = digitalRead(pin) == LOW;
   
-  if (reading != previousState) {
+  if (reading != lastReading) {
     lastChangeTime = millis();
-    previousState = reading;
+    lastReading = reading;
   }
 
   if (millis() - lastChangeTime > 20) {

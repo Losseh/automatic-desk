@@ -62,7 +62,9 @@ void updateButtons() {
 // the loop function runs over and over again forever
 void loop() {
 
-  if (motor.isMovingDown() && lowerLimitSwitch.isPressed()) {
+  bool lowerLimitActive = lowerLimitSwitch.isPressed();
+
+  if (motor.isMovingDown() && lowerLimitActive) {
     motor.stopInstant();
   }
 
@@ -76,7 +78,7 @@ void loop() {
   } else if (upBtn.isPressed()) {
     motor.up();
   } else if (downBtn.isPressed()) {
-    if (!lowerLimitSwitch.isPressed()) {
+    if (!lowerLimitActive) {
       motor.down();
     }
   } else {

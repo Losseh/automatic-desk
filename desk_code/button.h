@@ -14,6 +14,6 @@ public:
 private:
     uint8_t pin;
     bool stableState;
-    bool previousState;
+    bool lastReading;
     unsigned long lastChangeTime;
 };
