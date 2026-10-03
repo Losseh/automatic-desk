@@ -3,6 +3,7 @@
 #include "motor.h"
 #include "current_sensor.h"
 #include "limit_switch.h"
+#include "components.h"
 #include "state/command_controller.h"
 #include "Arduino.h"
 
@@ -28,7 +29,14 @@ MotorConstants motorConstants = {10};
 Motor motor(motorPins, motorConstants);
 
 // command state controller
-CommandController controller(upBtn, downBtn, motor, lowerLimitSwitch);
+Components components = {
+  upBtn,
+  downBtn,
+  motor,
+  lowerLimitSwitch,
+  currentSensor
+};
+CommandController controller(components);
 
 // loop counter
 uint8_t loopCounter = 0;

@@ -1,24 +1,19 @@
 #include "command_state.h"
 #include "command_state_pool.h"
-#include "motor.h"
-#include "limit_switch.h"
+#include "components.h"
 #include "direction.h"
-#include "button.h"
 
 #pragma once
 
 class ShortPressedCommandState : public CommandState {
 public:
-  ShortPressedCommandState(CommandStatePool& commandStatePool, Button& upBtn, Button& downBtn, Motor& motor, LimitSwitch& lowerLimitSwitch);
+  ShortPressedCommandState(CommandStatePool& commandStatePool, Components& components);
   void init(const StateContext& stateContext);
   StateTransition update(StateContext& stateContext);
 
 private:
   CommandStatePool& commandStatePool;
-  Button& upBtn;
-  Button& downBtn; 
-  Motor& motor;
-  LimitSwitch& lowerLimitSwitch;
+  Components& components;
 
   Direction direction;
 };

@@ -1,19 +1,14 @@
 #include "command_state.h"
-#include "button.h"
-#include "motor.h"
-#include "limit_switch.h"
 #include "command_state_pool.h"
+#include "components.h"
 
 class CommandController {
 public:
-  CommandController(Button& upBtn, Button& downBtn, Motor& motor, LimitSwitch& lowerLimitSwitch);
+  CommandController(Components& components);
   void update();
 
 private:
-  Button& upBtn;
-  Button& downBtn;
-  Motor& motor;
-  LimitSwitch& lowerLimitSwitch;
+  Components& components;
 
   CommandStatePool statePool;
   CommandState* current;

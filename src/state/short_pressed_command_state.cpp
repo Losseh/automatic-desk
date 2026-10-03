@@ -2,13 +2,9 @@
 #include "short_pressed_command_state.h"
 #include "Arduino.h"
 
-ShortPressedCommandState::ShortPressedCommandState(CommandStatePool& commandStatePool, Button& upBtn, Button& downBtn, 
-  Motor& motor, LimitSwitch& lowerLimitSwitch) : 
+ShortPressedCommandState::ShortPressedCommandState(CommandStatePool& commandStatePool, Components& components) : 
   commandStatePool(commandStatePool),
-  upBtn(upBtn),
-  downBtn(downBtn),
-  motor(motor),
-  lowerLimitSwitch(lowerLimitSwitch)
+  components(components)
   {}
 
 void ShortPressedCommandState::init(const StateContext& stateContext) {
@@ -17,9 +13,9 @@ void ShortPressedCommandState::init(const StateContext& stateContext) {
 
 StateTransition ShortPressedCommandState::update(StateContext& stateContext) {
   // any button pressed -> end of short-press
-  bool upPressed = upBtn.isPressed();
-  if (upPressed || downBtn.isPressed()) {
-    motor.stop();
+  bool upPressed = components.upBtn.isPressed();
+  if (upPressed || components.downBtn.isPressed()) {
+    components.motor.stop();
 
     Serial.write("short-pressed -> wait-for-release\n");
     return {
@@ -31,22 +27,21 @@ StateTransition ShortPressedCommandState::update(StateContext& stateContext) {
   // TODO aszymanski: stop instant should happen also when current exceeds the limit
   switch (stateContext.direction) {
     case Direction::UP:
-      motor.up();
+      components.motor.up();
       break;
 
     case Direction::DOWN:
-      if (lowerLimitSwitch.isPressed()) {
-        motor.stopInstant();
+      if (components.lowerLimitSwitch.isPressed()) {
+        components.motor.stopInstant();
         return {
           commandStatePool.idle,
           {}
         };
       } else {
-        motor.down();
+        components.motor.down();
       }
       break;
 
-    // Serial.write("short-pressed -> short-pressed\n");
     return {
       this,
       stateContext
@@ -54,7 +49,6 @@ StateTransition ShortPressedCommandState::update(StateContext& stateContext) {
   }
 
 
-  // Serial.write("short-pressed -> short-pressed\n");
   return {
     this,
     stateContext

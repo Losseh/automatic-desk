@@ -2,27 +2,22 @@
 #include "long_pressed_command_state.h"
 #include "Arduino.h"
 
-LongPressedCommandState::LongPressedCommandState(CommandStatePool& commandStatePool, Button& upBtn, Button& downBtn, 
-  Motor& motor, LimitSwitch& lowerLimitSwitch) : 
+LongPressedCommandState::LongPressedCommandState(CommandStatePool& commandStatePool, Components& components) : 
   commandStatePool(commandStatePool),
-  upBtn(upBtn),
-  downBtn(downBtn),
-  motor(motor),
-  lowerLimitSwitch(lowerLimitSwitch)
+  components(components)
   {}
 
 void LongPressedCommandState::init(const StateContext& stateContext) {
-  this->direction = stateContext.direction;
+  direction = stateContext.direction;
+  initiatingButton = direction == Direction::UP ? 
+    &components.upBtn : 
+    &components.downBtn;
 }
 
 StateTransition LongPressedCommandState::update(StateContext& stateContext) {
-  Button& button = direction == Direction::UP ? 
-    upBtn : 
-    downBtn;
-
   // button released -> end of long-press
-  if (!button.isPressed()) {
-    motor.stop();
+  if (!initiatingButton->isPressed()) {
+    components.motor.stop();
 
     Serial.write("long-pressed -> idle\n");
     return {
@@ -32,16 +27,16 @@ StateTransition LongPressedCommandState::update(StateContext& stateContext) {
   }
 
   // TODO aszymanski: stop instant should happen also when current exceeds the limit
-  switch (stateContext.direction) {
+  switch (direction) {
     case Direction::UP:
-      motor.up();
+      components.motor.up();
       break;
 
     case Direction::DOWN:
-      if (lowerLimitSwitch.isPressed()) {
-        motor.stopInstant();
+      if (components.lowerLimitSwitch.isPressed()) {
+        components.motor.stopInstant();
       } else {
-        motor.down();
+        components.motor.down();
       }
       break;
   }

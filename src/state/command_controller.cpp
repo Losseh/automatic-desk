@@ -5,17 +5,15 @@
 #include "long_pressed_command_state.h"
 #include "wait_for_release_state.h"
 
-CommandController::CommandController(Button& upBtn, Button& downBtn, Motor& motor, LimitSwitch& lowerLimitSwitch) : 
-  upBtn(upBtn), 
-  downBtn(downBtn), 
-  motor(motor),
-  lowerLimitSwitch(lowerLimitSwitch)
+CommandController::CommandController(Components& components) : 
+  components(components)
   {
-    statePool.idle = new IdleCommandState(statePool, upBtn, downBtn);
-    statePool.pressed = new PressedCommandState(statePool, upBtn, downBtn);
-    statePool.shortPress = new ShortPressedCommandState(statePool, upBtn, downBtn, motor, lowerLimitSwitch);
-    statePool.longPress = new LongPressedCommandState(statePool, upBtn, downBtn, motor, lowerLimitSwitch);
-    statePool.waitForRelease = new WaitForReleaseState(statePool, upBtn, downBtn);
+    statePool.idle = new IdleCommandState(statePool, components.upBtn, components.upBtn);
+    statePool.pressed = new PressedCommandState(statePool, components.upBtn, components.upBtn);
+    statePool.shortPress = new ShortPressedCommandState(statePool, components);
+    statePool.longPress = new LongPressedCommandState(statePool, components);
+    statePool.waitForRelease = new WaitForReleaseState(
+      statePool, components.upBtn, components.downBtn);
 
     current = statePool.idle;
     current->init(stateContext);
