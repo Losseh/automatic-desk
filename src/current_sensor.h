@@ -3,6 +3,7 @@
 
 struct CurrentSensorParams {
   int zeroValue;
+  int maxValue;
   int samples;
   int previousAverageWeight;
 };
@@ -13,6 +14,7 @@ public:
   void measure();
   int previous() const;
   int movingAverage() const;
+  bool exceedsLimit() const;
 
 private:
   struct State {

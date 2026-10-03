@@ -21,7 +21,9 @@ Button calBtn(9);
 LimitSwitch lowerLimitSwitch(10);
 
 // current sensor
-CurrentSensor currentSensor(A0, {537, 3, 5});
+// TODO aszymanski: 600 as the max value is arbitrary. we need to measure first what current
+// does the motor consume in case of a short-circuit mode work and adjust the value accordingly
+CurrentSensor currentSensor(A0, {537, 600, 3, 5});
 
 // motor
 MotorPins motorPins = {11, 12};

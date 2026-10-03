@@ -24,3 +24,7 @@ int CurrentSensor::previous() const {
 int CurrentSensor::movingAverage() const {
   return state.movingAverage;
 }
+
+bool CurrentSensor::exceedsLimit() const {
+  return state.previous >= params.maxValue;
+}
