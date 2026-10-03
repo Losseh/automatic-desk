@@ -9,3 +9,9 @@ in the development cycle.
 
 More information about PlatformIO Unit Testing:
 - https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+
+Run tests with:
+pio test -e native -vvv
+
+Install PlatformIO with:
+pipx install platformio
