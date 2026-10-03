@@ -1,17 +1,17 @@
 #include "command_state.h"
 #include "command_state_pool.h"
 #include "button.h"
-#include "direction.h"
 
-#pragma once
-
-class IdleCommandState : public CommandState {
+class WaitForReleaseState : public CommandState {
 public:
-  IdleCommandState(CommandStatePool& commandStatePool, Button& upBtn, Button& downBtn);
+  WaitForReleaseState(CommandStatePool& commandStatePool, Button& upBtn, Button& downBtn);
+  void init(const StateContext& stateContext);
   StateTransition update(StateContext& stateContext);
 
 private:
   CommandStatePool& commandStatePool;
   Button& upBtn;
   Button& downBtn;
+
+  Button* initiatingBtn;
 };

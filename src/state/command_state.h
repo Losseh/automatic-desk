@@ -1,10 +1,11 @@
-#include "button.h"
+#include "direction.h"
 
 #pragma once
 
+class CommandState;
+
 struct StateContext {
-  Button& button;
-  unsigned long startedAt;
+  Direction direction;
 };
 
 struct StateTransition {
@@ -15,5 +16,6 @@ struct StateTransition {
 class CommandState {
 public:
   virtual ~CommandState() = default;
-  virtual StateTransition update() = 0;
+  virtual void init(const StateContext& stateContext) {}
+  virtual StateTransition update(StateContext& stateContext) = 0;
 };

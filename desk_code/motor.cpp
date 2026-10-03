@@ -25,11 +25,11 @@ void Motor::update() {
   state.actual = constrain(state.actual, -MAX_PWM, MAX_PWM);
 
   if (diff != 0) {
-    Serial.write("motor exp=");
+    // Serial.write("motor exp=");
   //   Serial.print(state.target);
   //   Serial.write(" act=");
-    Serial.print(state.actual);
-    Serial.write("\n");
+    // Serial.print(state.actual);
+    // Serial.write("\n");
   }
 
   apply();

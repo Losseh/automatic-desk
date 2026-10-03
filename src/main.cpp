@@ -3,6 +3,7 @@
 #include "motor.h"
 #include "current_sensor.h"
 #include "limit_switch.h"
+#include "state/command_controller.h"
 #include "Arduino.h"
 
 // leds
@@ -25,6 +26,9 @@ CurrentSensor currentSensor(A0, {537, 3, 5});
 MotorPins motorPins = {11, 12};
 MotorConstants motorConstants = {10};
 Motor motor(motorPins, motorConstants);
+
+// command state controller
+CommandController controller(upBtn, downBtn, motor, lowerLimitSwitch);
 
 // loop counter
 uint8_t loopCounter = 0;
@@ -71,20 +75,11 @@ void loop() {
 
   updateButtons();
 
-  redLed.set(!downBtn.isPressed());
-  yellowLed.set(!upBtn.isPressed());
+  controller.update();
 
-  if (upBtn.isPressed() && downBtn.isPressed()) {
-    motor.stop();
-  } else if (upBtn.isPressed()) {
-    motor.up();
-  } else if (downBtn.isPressed()) {
-    if (!lowerLimitActive) {
-      motor.down();
-    }
-  } else {
-    motor.stop();
-  }
+  // TODO aszymanski: what information should those diodes present?
+  // redLed.set(!downBtn.isPressed());
+  // yellowLed.set(!upBtn.isPressed());
 
   currentSensor.measure();
   motor.update();
