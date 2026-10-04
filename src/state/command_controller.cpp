@@ -8,8 +8,8 @@
 CommandController::CommandController(Components& components) : 
   components(components)
   {
-    statePool.idle = new IdleCommandState(statePool, components.upBtn, components.upBtn);
-    statePool.pressed = new PressedCommandState(statePool, components.upBtn, components.upBtn);
+    statePool.idle = new IdleCommandState(statePool, components.upBtn, components.downBtn);
+    statePool.pressed = new PressedCommandState(statePool, components.upBtn, components.downBtn);
     statePool.shortPress = new ShortPressedCommandState(statePool, components);
     statePool.longPress = new LongPressedCommandState(statePool, components);
     statePool.waitForRelease = new WaitForReleaseState(

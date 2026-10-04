@@ -26,6 +26,14 @@ StateTransition LongPressedCommandState::update(StateContext& stateContext) {
     };
   }
 
+  if (components.currentSensor.exceedsLimit()) {
+    components.motor.stopInstant();
+    return {
+      commandStatePool.idle,
+      {}
+    };
+  }
+
   // TODO aszymanski: stop instant should happen also when current exceeds the limit
   switch (direction) {
     case Direction::UP:

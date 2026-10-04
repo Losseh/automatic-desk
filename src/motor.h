@@ -1,6 +1,7 @@
-#include "stdint.h"
-
 #pragma once
+
+#include "stdint.h"
+#include "direction.h"
 
 struct MotorPins {
   uint8_t pwm;
@@ -25,7 +26,7 @@ public:
   void stopInstant();
 
   int speed() const;
-  bool isMovingDown() const;
+  Direction getDirection() const;
 
 private:
   struct State {

@@ -24,7 +24,14 @@ StateTransition ShortPressedCommandState::update(StateContext& stateContext) {
     };
   }
 
-  // TODO aszymanski: stop instant should happen also when current exceeds the limit
+  if (components.currentSensor.exceedsLimit()) {
+    components.motor.stopInstant();
+    return {
+      commandStatePool.idle,
+      {}
+    };
+  }
+
   switch (stateContext.direction) {
     case Direction::UP:
       components.motor.up();

@@ -4,6 +4,7 @@
 #include "current_sensor.h"
 #include "limit_switch.h"
 #include "components.h"
+#include "position.h"
 #include "state/command_controller.h"
 #include "Arduino.h"
 
@@ -23,12 +24,33 @@ LimitSwitch lowerLimitSwitch(10);
 // current sensor
 // TODO aszymanski: 600 as the max value is arbitrary. we need to measure first what current
 // does the motor consume in case of a short-circuit mode work and adjust the value accordingly
-CurrentSensor currentSensor(A0, {537, 600, 3, 5});
+// normal work up = ~44
+// normal work down = ~29
+// blocked = ~304
+CurrentSensor currentSensor(A0, {527, 200, 3, 5});
 
 // motor
 MotorPins motorPins = {11, 12};
 MotorConstants motorConstants = {10};
 Motor motor(motorPins, motorConstants);
+
+// encoder
+const int encoderPin = 2;
+constexpr unsigned long MIN_PULSE_INTERVAL_US = 1000;
+
+volatile unsigned long lastPulse = 0;
+volatile long encoderPulses = 0;
+
+Position position;
+
+void onEncoderPulse() {
+    unsigned long now = micros();
+
+    if (now - lastPulse >= MIN_PULSE_INTERVAL_US) {
+        encoderPulses++;
+        lastPulse = now;
+    }
+}
 
 // command state controller
 Components components = {
@@ -65,6 +87,14 @@ void setup() {
   // initialize limit switch
   lowerLimitSwitch.begin();
 
+  // initialize encoder interrupt
+  pinMode(encoderPin, INPUT_PULLUP);
+  attachInterrupt(
+    digitalPinToInterrupt(encoderPin),
+    onEncoderPulse,
+    RISING
+  );
+
   Serial.begin(9600);
 }
 
@@ -74,12 +104,23 @@ void updateButtons() {
   calBtn.update();
 }
 
+void updatePosition() {
+  noInterrupts();
+  long pulses = encoderPulses;
+  encoderPulses = 0;
+  interrupts();
+
+  if (pulses > 0) {
+      position.update(pulses, motor.getDirection());
+  }
+}
+
 // the loop function runs over and over again forever
 void loop() {
 
   bool lowerLimitActive = lowerLimitSwitch.isPressed();
 
-  if (motor.isMovingDown() && lowerLimitActive) {
+  if (motor.getDirection() == Direction::DOWN && lowerLimitActive) {
     motor.stopInstant();
   }
 
@@ -93,52 +134,56 @@ void loop() {
 
   currentSensor.measure();
   motor.update();
+  updatePosition();
 
-  // if (loopCounter == 0) {
-  //   Serial.write("current ma=");
-  //   Serial.print(currentSensor.movingAverage());
-  //   Serial.write("\ncurrent prev=");
-  //   Serial.print(currentSensor.previous());
-  //   Serial.write("\n");
+  // if (Serial.available() && loopCounter == 0) {
+  //   int inByte = Serial.read();
+
+  //   if (inByte == '0') {
+  //     motor.setSpeed(0);
+  //   } else if (inByte == '1') {
+  //     motor.setSpeed(50);
+  //   } else if (inByte == '2') {
+  //     motor.setSpeed(150);
+  //   } else if (inByte == '3') {
+  //     motor.setSpeed(255);
+  //   } else if (inByte == '4') {
+  //     motor.setSpeed(-50);
+  //   } else if (inByte == '5') {
+  //     motor.setSpeed(-150);
+  //   } else if (inByte == '6') {
+  //     motor.setSpeed(-255);
+  //   }
+
+  //   // yellow led
+  //   if (inByte == 'a') {
+  //     yellowLed.switchOn();
+  //   } else if (inByte == 'z') {
+  //     yellowLed.switchOff();
+  //   }
+
+  //   // red pin
+  //   if (inByte == 's') {
+  //     redLed.switchOn();
+  //   } else if (inByte == 'x') {
+  //     redLed.switchOff();
+  //   }
+
   // }
 
-  if (Serial.available() && loopCounter == 0) {
-    int inByte = Serial.read();
+  // if (loopCounter == 255) {
+  //   loopCounter = 0;
+  //   Serial.print("position = ");
+  //   Serial.print(position.getPosition());
+  //   Serial.print("\n");
 
-    if (inByte == '0') {
-      motor.setSpeed(0);
-    } else if (inByte == '1') {
-      motor.setSpeed(50);
-    } else if (inByte == '2') {
-      motor.setSpeed(150);
-    } else if (inByte == '3') {
-      motor.setSpeed(255);
-    } else if (inByte == '4') {
-      motor.setSpeed(-50);
-    } else if (inByte == '5') {
-      motor.setSpeed(-150);
-    } else if (inByte == '6') {
-      motor.setSpeed(-255);
-    }
+  // Serial.print("crnt raw=");
+  // Serial.print(currentSensor.previous());
+  // Serial.print(" ma=");
+  // Serial.print(currentSensor.movingAverage());
+  // Serial.print("\n");
+  // } else {
+  //   loopCounter++;
+  // }
 
-    // yellow led
-    if (inByte == 'a') {
-      yellowLed.switchOn();
-    } else if (inByte == 'z') {
-      yellowLed.switchOff();
-    }
-
-    // red pin
-    if (inByte == 's') {
-      redLed.switchOn();
-    } else if (inByte == 'x') {
-      redLed.switchOff();
-    }
-
-  }
-
-  if (loopCounter > 300) {
-  } else {
-    loopCounter++;
-  }
 }

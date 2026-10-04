@@ -1,9 +1,9 @@
+#pragma once
+
 #include "command_state.h"
 #include "command_state_pool.h"
 #include "button.h"
-#include "direction.h"
-
-#pragma once
+#include "../direction.h"
 
 class IdleCommandState : public CommandState {
 public:

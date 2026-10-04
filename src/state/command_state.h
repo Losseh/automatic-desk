@@ -1,6 +1,6 @@
-#include "direction.h"
-
 #pragma once
+
+#include "../direction.h"
 
 class CommandState;
 
